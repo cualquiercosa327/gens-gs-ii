@@ -509,7 +509,7 @@ void RomCartridgeMD::updateSysBanking(int banks)
 			const uint32_t romAddrStart = (0x80000 * (m_cartBanks[i] - BANK_ROM_00));
 			if (romAddrStart < m_romData_size) {
 				// Valid bank. Map it.
-				M68K::SetFetch(romAddrStart, romAddrStart + 0x7FFFF, m_romData);
+				M68K::SetFetch(romAddrStart, romAddrStart + 0x7FFFF, m_romData + romAddrStart);
 				banksUpdated++;
 			}
 		}

@@ -1523,8 +1523,6 @@ uint8_t M68K_Mem::M68K_RB(uint32_t address)
 	// TODO: Optimize the switch using a bitwise AND.
 	switch (ms_M68KBank_Type[bank]) {
 		case M68K_BANK_UNUSED:
-			address &= 0xFFFF;
-			return Ram_68k.u8[address];
 		default:
 			return 0xFF;
 
@@ -1558,8 +1556,6 @@ uint16_t M68K_Mem::M68K_RW(uint32_t address)
 	// TODO: Optimize the switch using a bitwise AND.
 	switch (ms_M68KBank_Type[bank]) {
 		case M68K_BANK_UNUSED:
-			address &= 0xFFFF;
-			return Ram_68k.u16[address >> 1];
 		default:
 			return 0xFFFF;
 		
@@ -1593,11 +1589,8 @@ void M68K_Mem::M68K_WB(uint32_t address, uint8_t data)
 
 	// TODO: Optimize the switch using a bitwise AND.
 	switch (ms_M68KBank_Type[bank]) {
-		case M68K_BANK_UNUSED:
-			address &= 0xFFFF;
-			Ram_68k.u8[address] = data;
-			break;
 		default:
+		case M68K_BANK_UNUSED:
 		case M68K_BANK_TMSS_ROM:
 			break;
 

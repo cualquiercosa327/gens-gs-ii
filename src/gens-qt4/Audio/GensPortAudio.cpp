@@ -25,6 +25,7 @@
 
 // C includes.
 #include <string.h>
+#include <stdio.h>
 
 // LOG_MSG() subsystem.
 #include "libgens/macros/log_msg.h"

@@ -79,9 +79,13 @@ class M68K
 		static inline unsigned int TripOdometer(void);
 		static inline void SetFetch(unsigned low_adr, unsigned high_adr, void *fetch_adr);
 		/** END: C68k wrapper functions. **/
+		
+		static inline int GetVector(int level);
 	
 	protected:
 		static c68k_struc ms_Context;
+		static int m_cycleCnt;		// Cycles currently run.
+		static int m_intVectors[8];
 		
 		// TODO: What does the Reset Handler function do?
 		static void M68K_Reset_Handler(void);
@@ -112,6 +116,7 @@ inline void M68K::Reset(void)
  */
 inline int M68K::Interrupt(int level, int vector)
 {
+	m_intVectors[level] = vector;
 	C68k_Set_IRQ(&ms_Context, level);
 	return 0;
 }
@@ -122,7 +127,7 @@ inline int M68K::Interrupt(int level, int vector)
  */
 inline unsigned int M68K::ReadOdometer(void)
 {
-	return C68k_Get_CycleDone(&ms_Context);
+	return m_cycleCnt + C68k_Get_CycleDone(&ms_Context);
 }
 
 /**
@@ -131,8 +136,7 @@ inline unsigned int M68K::ReadOdometer(void)
 */
 inline void M68K::ReleaseCycles(int cycles)
 {
-	while ( cycles -- )
-		C68k_Release_Cycle(&ms_Context);
+	C68k_Release_Cycle(&ms_Context);
 }
 
 /**
@@ -151,7 +155,20 @@ inline void M68K::AddCycles(int cycles)
  */
 inline unsigned int M68K::Exec(int n)
 {
-	return C68k_Exec(&ms_Context, n);
+	int cyclesToRun = n - m_cycleCnt;
+	int ret;
+	
+	if (cyclesToRun <= 0)
+		return 0;
+
+	ret = C68k_Exec(&ms_Context, cyclesToRun);
+
+	if ( ret >= 0)
+		m_cycleCnt += ret;
+	else
+		m_cycleCnt += cyclesToRun;
+	
+	return 0;
 }
 
 /**
@@ -160,12 +177,20 @@ inline unsigned int M68K::Exec(int n)
 */
 inline unsigned int M68K::TripOdometer(void)
 {
-	return 0;//main68k_tripOdometer();
+	m_cycleCnt = 0;
+	return 0;
 }
 
 inline void M68K::SetFetch(unsigned low_adr, unsigned high_adr, void *fetch_adr)
 {
 	C68k_Set_Fetch(&ms_Context, low_adr, high_adr, (pointer)fetch_adr);
+}
+
+inline int M68K::GetVector(int level)
+{
+	if ( level < 8 )
+		return m_intVectors[level];
+	return -1;
 }
 
 #else /* !GENS_ENABLE_EMULATION */

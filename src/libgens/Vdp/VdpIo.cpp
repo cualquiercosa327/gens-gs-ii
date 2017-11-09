@@ -88,6 +88,8 @@ uint8_t Vdp::Int_Ack(void)
 	return 0;
 }
 
+
+
 /**
  * Update the IRQ line.
  * @param interrupt Interrupt that just occurred. (If 0, no interrupt occurred.)
@@ -111,7 +113,7 @@ void Vdp::updateIRQLine(int interrupt)
 	// No VDP interrupts.
 	// TODO: Move to M68K class.
 #ifdef GENS_ENABLE_EMULATION
-	//M68K::
+	M68K::Interrupt( 0, M68K::GetVector(0) & 0xF0 );
 	//main68k_context.interrupts[0] &= 0xF0;
 #endif /* GENS_ENABLE_EMULATION */
 }

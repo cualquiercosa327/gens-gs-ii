@@ -25,9 +25,13 @@
 
 #include "M68K.hpp"
 #include "M68K_Mem.hpp"
+#include "../Vdp/Vdp.hpp"
 
 #include "macros/common.h"
 #include "Cartridge/RomCartridgeMD.hpp"
+
+// Emulation Context.
+#include "EmuContext/EmuContext.hpp"
 
 // C includes. (C++ namespace)
 #include <cstring>
@@ -35,6 +39,8 @@
 namespace LibGens {
 
 c68k_struc M68K::ms_Context;
+int M68K::m_cycleCnt = 0;
+int M68K::m_intVectors[8];
 
 static u32 Gens_M68K_RB(u32 address)
 {
@@ -55,6 +61,15 @@ static void Gens_M68K_WW(uint32_t address, u32 data)
 {
 	/** WORKAROUND for Starscream not properly saving ecx/edx. **/
 	LibGens::M68K_Mem::M68K_WW(address, data);
+}
+
+static s32 Gens_M68K_Interrupt_Ack(s32 level)
+{
+	LibGens::EmuContext *instance = LibGens::EmuContext::Instance();
+	if (instance != nullptr)
+		instance->m_vdp->Int_Ack();
+
+	return M68K::GetVector(level);
 }
 
 // Last system ID.
@@ -78,7 +93,7 @@ void M68K::Init(void)
 	memset(&ms_Context, 0x00, sizeof(ms_Context));
 
 	// Initialize the memory handlers.
-	C68k_Init(&ms_Context, NULL);
+	C68k_Init(&ms_Context, Gens_M68K_Interrupt_Ack);
 	
 	C68k_Set_ReadB(&ms_Context, Gens_M68K_RB);
 	C68k_Set_ReadW(&ms_Context, Gens_M68K_RW);
@@ -112,8 +127,12 @@ void M68K::InitSys(SysID system)
 
 	// Initialize the M68K memory handlers.
 	M68K_Mem::InitSys(system);
+	m_cycleCnt = 0;
 
 	// Initialize M68K RAM handlers.
+	for (int i = 0; i < ((1 << 24) / 32); i++) {
+		SetFetch(i * 32, ((i * 32) | 0x1F), dummy_ram);
+	}
 	for (int i = 0; i < 32; i++) {
 		uint32_t ram_addr = (0xE00000 | (i << 16));
 		SetFetch(ram_addr, (ram_addr | 0xFFFF), Ram_68k.u8);
