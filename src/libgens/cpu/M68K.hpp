@@ -26,7 +26,7 @@
 
 #include <libgens/config.libgens.h>
 
-#include "star_68k.h"
+#include "../c68k/c68k.h"
 
 // ZOMG M68K structs.
 #include "libzomg/zomg_m68k.h"
@@ -69,7 +69,7 @@ class M68K
 		static void ZomgSaveReg(Zomg_M68KRegSave_t *state);
 		static void ZomgRestoreReg(const Zomg_M68KRegSave_t *state);
 		
-		/** BEGIN: Starscream wrapper functions. **/
+		/** BEGIN: C68k wrapper functions. **/
 		static inline void Reset(void);
 		static inline int Interrupt(int level, int vector);
 		static inline unsigned int ReadOdometer(void);
@@ -77,16 +77,11 @@ class M68K
 		static inline void AddCycles(int cycles);
 		static inline unsigned int Exec(int n);
 		static inline unsigned int TripOdometer(void);
-		/** END: Starscream wrapper functions. **/
+		static inline void SetFetch(unsigned low_adr, unsigned high_adr, void *fetch_adr);
+		/** END: C68k wrapper functions. **/
 	
 	protected:
-		static S68000CONTEXT ms_Context;
-		
-		static STARSCREAM_PROGRAMREGION M68K_Fetch[];
-		static STARSCREAM_DATAREGION M68K_Read_Byte[4];
-		static STARSCREAM_DATAREGION M68K_Read_Word[4];
-		static STARSCREAM_DATAREGION M68K_Write_Byte[3];
-		static STARSCREAM_DATAREGION M68K_Write_Word[3];
+		static c68k_struc ms_Context;
 		
 		// TODO: What does the Reset Handler function do?
 		static void M68K_Reset_Handler(void);
@@ -106,7 +101,7 @@ class M68K
  */
 inline void M68K::Reset(void)
 {
-	main68k_reset();
+	C68k_Reset(&ms_Context);
 }
 
 /**
@@ -117,7 +112,8 @@ inline void M68K::Reset(void)
  */
 inline int M68K::Interrupt(int level, int vector)
 {
-	return main68k_interrupt(level, vector);
+	C68k_Set_IRQ(&ms_Context, level);
+	return 0;
 }
 
 /**
@@ -126,7 +122,7 @@ inline int M68K::Interrupt(int level, int vector)
  */
 inline unsigned int M68K::ReadOdometer(void)
 {
-	return main68k_readOdometer();
+	return C68k_Get_CycleDone(&ms_Context);
 }
 
 /**
@@ -135,7 +131,8 @@ inline unsigned int M68K::ReadOdometer(void)
 */
 inline void M68K::ReleaseCycles(int cycles)
 {
-	main68k_releaseCycles(cycles);
+	while ( cycles -- )
+		C68k_Release_Cycle(&ms_Context);
 }
 
 /**
@@ -144,7 +141,7 @@ inline void M68K::ReleaseCycles(int cycles)
  */
 inline void M68K::AddCycles(int cycles)
 {
-	main68k_addCycles(cycles);
+	C68k_Add_Cycle(&ms_Context, cycles);
 }
 
 /**
@@ -154,7 +151,7 @@ inline void M68K::AddCycles(int cycles)
  */
 inline unsigned int M68K::Exec(int n)
 {
-	return main68k_exec(n);
+	return C68k_Exec(&ms_Context, n);
 }
 
 /**
@@ -163,7 +160,12 @@ inline unsigned int M68K::Exec(int n)
 */
 inline unsigned int M68K::TripOdometer(void)
 {
-	return main68k_tripOdometer();
+	return 0;//main68k_tripOdometer();
+}
+
+inline void M68K::SetFetch(unsigned low_adr, unsigned high_adr, void *fetch_adr)
+{
+	C68k_Set_Fetch(&ms_Context, low_adr, high_adr, (pointer)fetch_adr);
 }
 
 #else /* !GENS_ENABLE_EMULATION */

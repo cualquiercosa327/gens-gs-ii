@@ -55,36 +55,6 @@ Ram_68k_t Ram_68k;
 #include "libcompat/byteswap.h"
 #include "macros/log_msg.h"
 
-// C wrapper functions for Starscream.
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-uint8_t Gens_M68K_RB(uint32_t address)
-{
-	/** WORKAROUND for Starscream not properly saving ecx/edx. **/
-	return LibGens::M68K_Mem::M68K_RB(address);
-}
-uint16_t Gens_M68K_RW(uint32_t address)
-{
-	/** WORKAROUND for Starscream not properly saving ecx/edx. **/
-	return LibGens::M68K_Mem::M68K_RW(address);
-}
-void Gens_M68K_WB(uint32_t address, uint8_t data)
-{
-	/** WORKAROUND for Starscream not properly saving ecx/edx. **/
-	LibGens::M68K_Mem::M68K_WB(address, data);
-}
-void Gens_M68K_WW(uint32_t address, uint16_t data)
-{
-	/** WORKAROUND for Starscream not properly saving ecx/edx. **/
-	LibGens::M68K_Mem::M68K_WW(address, data);
-}
-
-#ifdef __cplusplus
-}
-#endif
-
 namespace LibGens {
 
 /** ROM and RAM variables. **/
@@ -1523,23 +1493,18 @@ void M68K_Mem::InitSys(M68K::SysID system)
  * @param banks Maximum number of banks to update.
  * @return Number of banks updated.
  */
-int M68K_Mem::UpdateSysBanking(STARSCREAM_PROGRAMREGION *M68K_Fetch, int banks)
+void M68K_Mem::UpdateSysBanking(int banks)
 {
 #ifdef GENS_ENABLE_EMULATION
 	// Mapping depends on if TMSS is mapped.
-	int cur_fetch = 0;
 	if (!tmss_reg.isTmssMapped()) {
 		// TMSS is not mapped.
 		// Update banking using RomCartridgeMD.
-		cur_fetch += ms_RomCartridge->updateSysBanking(&M68K_Fetch[cur_fetch], banks);
+		ms_RomCartridge->updateSysBanking(banks);
 	} else {
 		// TMSS is mapped.
-		cur_fetch += tmss_reg.updateSysBanking(&M68K_Fetch[cur_fetch], banks);
+		tmss_reg.updateSysBanking(banks);
 	}
-
-	return cur_fetch;
-#else
-	return 0;
 #endif
 }
 
@@ -1557,8 +1522,11 @@ uint8_t M68K_Mem::M68K_RB(uint32_t address)
 
 	// TODO: Optimize the switch using a bitwise AND.
 	switch (ms_M68KBank_Type[bank]) {
+		case M68K_BANK_UNUSED:
+			address &= 0xFFFF;
+			return Ram_68k.u8[address];
 		default:
-		case M68K_BANK_UNUSED:	return 0xFF;
+			return 0xFF;
 
 		// ROM cartridge.
 		case M68K_BANK_CARTRIDGE:
@@ -1589,8 +1557,11 @@ uint16_t M68K_Mem::M68K_RW(uint32_t address)
 
 	// TODO: Optimize the switch using a bitwise AND.
 	switch (ms_M68KBank_Type[bank]) {
+		case M68K_BANK_UNUSED:
+			address &= 0xFFFF;
+			return Ram_68k.u16[address >> 1];
 		default:
-		case M68K_BANK_UNUSED:	return 0xFFFF;
+			return 0xFFFF;
 		
 		// ROM cartridge.
 		case M68K_BANK_CARTRIDGE:
@@ -1622,8 +1593,11 @@ void M68K_Mem::M68K_WB(uint32_t address, uint8_t data)
 
 	// TODO: Optimize the switch using a bitwise AND.
 	switch (ms_M68KBank_Type[bank]) {
-		default:
 		case M68K_BANK_UNUSED:
+			address &= 0xFFFF;
+			Ram_68k.u8[address] = data;
+			break;
+		default:
 		case M68K_BANK_TMSS_ROM:
 			break;
 
@@ -1654,8 +1628,11 @@ void M68K_Mem::M68K_WW(uint32_t address, uint16_t data)
 
 	// TODO: Optimize the switch using a bitwise AND.
 	switch (ms_M68KBank_Type[bank]) {
-		default:
 		case M68K_BANK_UNUSED:
+			address &= 0xFFFF;
+			Ram_68k.u16[address >> 1] = data;
+			break;
+		default:
 		case M68K_BANK_TMSS_ROM:
 			break;
 

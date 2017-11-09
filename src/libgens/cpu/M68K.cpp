@@ -34,88 +34,28 @@
 
 namespace LibGens {
 
-S68000CONTEXT M68K::ms_Context;
+c68k_struc M68K::ms_Context;
 
-// Instruction fetch.
-STARSCREAM_PROGRAMREGION M68K::M68K_Fetch[] =
+static u32 Gens_M68K_RB(u32 address)
 {
-#ifdef GENS_ENABLE_EMULATION
-	// 32 entries for RAM, including mirrors.
-	{~0U, ~0U, 0}, {~0U, ~0U, 0}, {~0U, ~0U, 0}, {~0U, ~0U, 0},
-	{~0U, ~0U, 0}, {~0U, ~0U, 0}, {~0U, ~0U, 0}, {~0U, ~0U, 0},
-	{~0U, ~0U, 0}, {~0U, ~0U, 0}, {~0U, ~0U, 0}, {~0U, ~0U, 0},
-	{~0U, ~0U, 0}, {~0U, ~0U, 0}, {~0U, ~0U, 0}, {~0U, ~0U, 0},
-	{~0U, ~0U, 0}, {~0U, ~0U, 0}, {~0U, ~0U, 0}, {~0U, ~0U, 0},
-	{~0U, ~0U, 0}, {~0U, ~0U, 0}, {~0U, ~0U, 0}, {~0U, ~0U, 0},
-	{~0U, ~0U, 0}, {~0U, ~0U, 0}, {~0U, ~0U, 0}, {~0U, ~0U, 0},
-	{~0U, ~0U, 0}, {~0U, ~0U, 0}, {~0U, ~0U, 0}, {~0U, ~0U, 0},
-
-	// 64 entries for ROM handlers.
-	{~0U, ~0U, 0}, {~0U, ~0U, 0}, {~0U, ~0U, 0}, {~0U, ~0U, 0},
-	{~0U, ~0U, 0}, {~0U, ~0U, 0}, {~0U, ~0U, 0}, {~0U, ~0U, 0},
-	{~0U, ~0U, 0}, {~0U, ~0U, 0}, {~0U, ~0U, 0}, {~0U, ~0U, 0},
-	{~0U, ~0U, 0}, {~0U, ~0U, 0}, {~0U, ~0U, 0}, {~0U, ~0U, 0},
-	{~0U, ~0U, 0}, {~0U, ~0U, 0}, {~0U, ~0U, 0}, {~0U, ~0U, 0},
-	{~0U, ~0U, 0}, {~0U, ~0U, 0}, {~0U, ~0U, 0}, {~0U, ~0U, 0},
-	{~0U, ~0U, 0}, {~0U, ~0U, 0}, {~0U, ~0U, 0}, {~0U, ~0U, 0},
-	{~0U, ~0U, 0}, {~0U, ~0U, 0}, {~0U, ~0U, 0}, {~0U, ~0U, 0},
-	{~0U, ~0U, 0}, {~0U, ~0U, 0}, {~0U, ~0U, 0}, {~0U, ~0U, 0},
-	{~0U, ~0U, 0}, {~0U, ~0U, 0}, {~0U, ~0U, 0}, {~0U, ~0U, 0},
-	{~0U, ~0U, 0}, {~0U, ~0U, 0}, {~0U, ~0U, 0}, {~0U, ~0U, 0},
-	{~0U, ~0U, 0}, {~0U, ~0U, 0}, {~0U, ~0U, 0}, {~0U, ~0U, 0},
-	{~0U, ~0U, 0}, {~0U, ~0U, 0}, {~0U, ~0U, 0}, {~0U, ~0U, 0},
-	{~0U, ~0U, 0}, {~0U, ~0U, 0}, {~0U, ~0U, 0}, {~0U, ~0U, 0},
-	{~0U, ~0U, 0}, {~0U, ~0U, 0}, {~0U, ~0U, 0}, {~0U, ~0U, 0},
-	{~0U, ~0U, 0}, {~0U, ~0U, 0}, {~0U, ~0U, 0}, {~0U, ~0U, 0},
-#endif /* GENS_ENABLE_EMULATION */
-	
-	// Terminator.
-	{~0U, ~0U, 0}
-};
-
-// M68K Starscream has a hack for RAM mirroring for data read.
-STARSCREAM_DATAREGION M68K::M68K_Read_Byte[4] =
+	/** WORKAROUND for Starscream not properly saving ecx/edx. **/
+	return LibGens::M68K_Mem::M68K_RB(address);
+}
+static u32 Gens_M68K_RW(u32 address)
 {
-#ifdef GENS_ENABLE_EMULATION
-	// TODO: 0x9FFFFF is valid for MD only.
-	{0x000000, 0x9FFFFF, NULL, NULL},
-	{0xFF0000, 0xFFFFFF, NULL, &Ram_68k.u8[0]},
-	{0xA00000, 0xFEFFFF, (void*)M68K_Mem::M68K_RB, NULL},
-#endif /* GENS_ENABLE_EMULATION */
-	{~0U, ~0U, NULL, NULL}
-};
-
-// M68K Starscream has a hack for RAM mirroring for data read.
-STARSCREAM_DATAREGION M68K::M68K_Read_Word[4] =
+	/** WORKAROUND for Starscream not properly saving ecx/edx. **/
+	return LibGens::M68K_Mem::M68K_RW(address);
+}
+static void Gens_M68K_WB(u32 address, u32 data)
 {
-#ifdef GENS_ENABLE_EMULATION
-	// TODO: 0x9FFFFF is valid for MD only.
-	{0x000000, 0x9FFFFF, NULL, NULL},
-	{0xFF0000, 0xFFFFFF, NULL, &Ram_68k.u8[0]},
-	{0xA00000, 0xFEFFFF, (void*)M68K_Mem::M68K_RW, NULL},
-#endif /* GENS_ENABLE_EMULATION */
-	{~0U, ~0U, NULL, NULL}
-};
-
-// M68K Starscream has a hack for RAM mirroring for data write.
-STARSCREAM_DATAREGION M68K::M68K_Write_Byte[3] =
+	/** WORKAROUND for Starscream not properly saving ecx/edx. **/
+	LibGens::M68K_Mem::M68K_WB(address, data);
+}
+static void Gens_M68K_WW(uint32_t address, u32 data)
 {
-#ifdef GENS_ENABLE_EMULATION
-	{0xFF0000, 0xFFFFFF, NULL, &Ram_68k.u8[0]},
-	{0x000000, 0xFEFFFF, (void*)M68K_Mem::M68K_WB, NULL},
-#endif /* GENS_ENABLE_EMULATION */
-	{~0U, ~0U, NULL, NULL}
-};
-
-// M68K Starscream has a hack for RAM mirroring for data write.
-STARSCREAM_DATAREGION M68K::M68K_Write_Word[3] =
-{
-#ifdef GENS_ENABLE_EMULATION
-	{0xFF0000, 0xFFFFFF, NULL, &Ram_68k.u8[0]},
-	{0x000000, 0xFEFFFF, (void*)M68K_Mem::M68K_WW, NULL},
-#endif /* GENS_ENABLE_EMULATION */
-	{~0U, ~0U, NULL, NULL}
-};
+	/** WORKAROUND for Starscream not properly saving ecx/edx. **/
+	LibGens::M68K_Mem::M68K_WW(address, data);
+}
 
 // Last system ID.
 M68K::SysID M68K::ms_LastSysID = SYSID_NONE;
@@ -138,28 +78,14 @@ void M68K::Init(void)
 	memset(&ms_Context, 0x00, sizeof(ms_Context));
 
 	// Initialize the memory handlers.
-	ms_Context.s_fetch = ms_Context.u_fetch =
-		ms_Context.fetch = M68K_Fetch;
+	C68k_Init(&ms_Context, NULL);
+	
+	C68k_Set_ReadB(&ms_Context, Gens_M68K_RB);
+	C68k_Set_ReadW(&ms_Context, Gens_M68K_RW);
+	C68k_Set_WriteB(&ms_Context, Gens_M68K_WB);
+	C68k_Set_WriteW(&ms_Context, Gens_M68K_WW);
 
-	ms_Context.s_readbyte = ms_Context.u_readbyte =
-		ms_Context.readbyte = M68K_Read_Byte;
-
-	ms_Context.s_readword = ms_Context.u_readword =
-		ms_Context.readword = M68K_Read_Word;
-
-	ms_Context.s_writebyte = ms_Context.u_writebyte =
-		ms_Context.writebyte = M68K_Write_Byte;
-
-	ms_Context.s_writeword = ms_Context.u_writeword =
-		ms_Context.writeword = M68K_Write_Word;
-
-	ms_Context.resethandler = M68K_Reset_Handler;
-
-#ifdef GENS_ENABLE_EMULATION
-	// Set up the main68k context.
-	main68k_SetContext(&ms_Context);
-	main68k_init();
-#endif /* GENS_ENABLE_EMULATION */
+	ms_Context.Reset_CallBack = M68K_Reset_Handler;
 }
 
 /**
@@ -169,6 +95,8 @@ void M68K::End(void)
 {
 	// TODO
 }
+
+static uint8_t dummy_ram[32];
 
 /**
  * Initialize a specific system for the M68K CPU emulator.
@@ -185,21 +113,17 @@ void M68K::InitSys(SysID system)
 	// Initialize the M68K memory handlers.
 	M68K_Mem::InitSys(system);
 
-#ifdef GENS_ENABLE_EMULATION
 	// Initialize M68K RAM handlers.
 	for (int i = 0; i < 32; i++) {
 		uint32_t ram_addr = (0xE00000 | (i << 16));
-		M68K_Fetch[i].lowaddr = ram_addr;
-		M68K_Fetch[i].highaddr = (ram_addr | 0xFFFF);
-		M68K_Fetch[i].offset = ((uint32_t)(&Ram_68k.u8[0]) - ram_addr);
+		SetFetch(ram_addr, (ram_addr | 0xFFFF), Ram_68k.u8);
 	}
 
 	// Update the system-specific banking setup.
 	UpdateSysBanking();
 
 	// Reset the M68K CPU.
-	main68k_reset();
-#endif /* GENS_ENABLE_EMULATION */
+	C68k_Reset(&ms_Context);
 }
 
 /**
@@ -207,10 +131,8 @@ void M68K::InitSys(SysID system)
  */
 void M68K::EndSys(void)
 {
-	for (int i = 0; i < ARRAY_SIZE(M68K_Fetch); i++) {
-		M68K_Fetch[i].lowaddr = -1;
-		M68K_Fetch[i].highaddr = -1;
-		M68K_Fetch[i].offset = 0;
+	for (int i = 0; i < ((1 << 24) / 32); i++) {
+		SetFetch(i * 32, ((i * 32) | 0x1F), dummy_ram);
 	}
 }
 
@@ -221,13 +143,12 @@ void M68K::EndSys(void)
 void M68K::UpdateSysBanking(void)
 {
 	// Start at M68K_Fetch[0x20].
-	int cur_fetch = 0x20;
 	switch (ms_LastSysID) {
 		case SYSID_MD:
 		case SYSID_PICO:
 			// Sega Genesis / Mega Drive.
 			// Also Pico. (This only adds cartridge ROM.)
-			cur_fetch += M68K_Mem::UpdateSysBanking(&M68K_Fetch[cur_fetch], 10);
+			M68K_Mem::UpdateSysBanking(10);
 			break;
 
 		case SYSID_MCD:
@@ -269,10 +190,10 @@ void M68K::UpdateSysBanking(void)
 	}
 
 	// Set the terminator.
-	M68K_Fetch[cur_fetch].lowaddr = -1;
+	/*M68K_Fetch[cur_fetch].lowaddr = -1;
 	M68K_Fetch[cur_fetch].highaddr = -1;
-	M68K_Fetch[cur_fetch].offset = 0;
-
+	M68K_Fetch[cur_fetch].offset = 0;*/
+	
 	// FIXME: Make sure Starscream's internal program counter
 	// is updated to reflect the updated M68K_Fetch[].
 }
@@ -287,7 +208,7 @@ void M68K::ZomgSaveReg(Zomg_M68KRegSave_t *state)
 {
 	// NOTE: Byteswapping is done in libzomg.
 	
-#ifdef GENS_ENABLE_EMULATION
+#if 0	// TODO
 	struct S68000CONTEXT m68k_context;
 	main68k_GetContext(&m68k_context);
 	
@@ -331,7 +252,7 @@ void M68K::ZomgSaveReg(Zomg_M68KRegSave_t *state)
  */
 void M68K::ZomgRestoreReg(const Zomg_M68KRegSave_t *state)
 {
-#ifdef GENS_ENABLE_EMULATION
+#if 0	// TODO
 	main68k_GetContext(&ms_Context);
 
 	// Load the main registers.
