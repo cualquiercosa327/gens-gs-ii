@@ -413,7 +413,7 @@ int RomCartridgeMD::loadRom(void)
 	m_romData_size = d->rom->romSize();
 	uint32_t rnd_512k = ((m_romData_size + 0x7FFFF) & ~0x7FFFF);
 	// Align to 16 bytes for potential SSE2 optimizations.
-	m_romData = aligned_malloc(16, rnd_512k);
+	m_romData = (uint8_t *)aligned_malloc(16, rnd_512k);
 
 	// Load the ROM image.
 	// NOTE: Passing the size of the entire ROM buffer,

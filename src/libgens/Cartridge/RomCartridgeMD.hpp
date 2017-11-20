@@ -174,7 +174,7 @@ class RomCartridgeMD
 
 		// ROM data. (Should be allocated in 512 KB blocks.)
 		// (Use malloc() and free() for this pointer.)
-		void *m_romData;
+		uint8_t *m_romData;
 		uint32_t m_romData_size;
 
 		// SRam and EEPRom.

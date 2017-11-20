@@ -88,7 +88,12 @@ class M68K
 		static int m_intVectors[8];
 		
 		// TODO: What does the Reset Handler function do?
-		static void M68K_Reset_Handler(void);
+		static void FASTCALL M68K_Reset_Handler(void);
+		static u32 FASTCALL Gens_M68K_RB(u32 address);
+		static u32 FASTCALL Gens_M68K_RW(u32 address);
+		static void FASTCALL Gens_M68K_WB(const u32 address, u32 data);
+		static void FASTCALL Gens_M68K_WW(const u32 address, u32 data);
+		static s32 FASTCALL Gens_M68K_Interrupt_Ack(s32 level);
 	
 	private:
 		M68K() { }
@@ -136,6 +141,7 @@ inline unsigned int M68K::ReadOdometer(void)
 */
 inline void M68K::ReleaseCycles(int cycles)
 {
+	(void) cycles;
 	C68k_Release_Cycle(&ms_Context);
 }
 

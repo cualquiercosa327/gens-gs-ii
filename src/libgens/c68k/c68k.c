@@ -32,6 +32,10 @@
 #include <stdio.h>
 #include <string.h>
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include "c68k.h"
 
 // include macro file

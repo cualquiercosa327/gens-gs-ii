@@ -42,28 +42,24 @@ c68k_struc M68K::ms_Context;
 int M68K::m_cycleCnt = 0;
 int M68K::m_intVectors[8];
 
-static u32 Gens_M68K_RB(u32 address)
+u32 FASTCALL M68K::Gens_M68K_RB(u32 address)
 {
-	/** WORKAROUND for Starscream not properly saving ecx/edx. **/
 	return LibGens::M68K_Mem::M68K_RB(address);
 }
-static u32 Gens_M68K_RW(u32 address)
+u32 FASTCALL M68K::Gens_M68K_RW(u32 address)
 {
-	/** WORKAROUND for Starscream not properly saving ecx/edx. **/
 	return LibGens::M68K_Mem::M68K_RW(address);
 }
-static void Gens_M68K_WB(u32 address, u32 data)
+void FASTCALL M68K::Gens_M68K_WB(const u32 address, u32 data)
 {
-	/** WORKAROUND for Starscream not properly saving ecx/edx. **/
 	LibGens::M68K_Mem::M68K_WB(address, data);
 }
-static void Gens_M68K_WW(uint32_t address, u32 data)
+void FASTCALL M68K::Gens_M68K_WW(const u32 address, u32 data)
 {
-	/** WORKAROUND for Starscream not properly saving ecx/edx. **/
 	LibGens::M68K_Mem::M68K_WW(address, data);
 }
 
-static s32 Gens_M68K_Interrupt_Ack(s32 level)
+s32 FASTCALL M68K::Gens_M68K_Interrupt_Ack(s32 level)
 {
 	LibGens::EmuContext *instance = LibGens::EmuContext::Instance();
 	if (instance != nullptr)
@@ -79,7 +75,7 @@ M68K::SysID M68K::ms_LastSysID = SYSID_NONE;
  * Reset handler.
  * TODO: What does this function do?
  */
-void M68K::M68K_Reset_Handler(void)
+void FASTCALL M68K::M68K_Reset_Handler(void)
 {
 	//Init_Memory_M68K(GENESIS);
 }
