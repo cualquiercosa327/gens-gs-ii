@@ -98,7 +98,7 @@ OP_0xB028:
 	u32 res;
 	pointer dst;
 	pointer src;
-	adr = CPU->A[(Opcode >> 0) & 7] + (s32)(s16)FETCH_WORD;
+	adr = CPU->A[(Opcode >> 0) & 7] + (u32)(s16)FETCH_WORD;
 	PC += 2;
 	PRE_IO
 	READ_BYTE_F(adr, src)
@@ -138,7 +138,7 @@ OP_0xB038:
 	u32 res;
 	pointer dst;
 	pointer src;
-	adr = (s32)(s16)FETCH_WORD;
+	adr = (u32)(s16)FETCH_WORD;
 	PC += 2;
 	PRE_IO
 	READ_BYTE_F(adr, src)
@@ -178,7 +178,7 @@ OP_0xB03A:
 	u32 res;
 	pointer dst;
 	pointer src;
-	adr = (PC - CPU->BasePC) + (s32)(s16)FETCH_WORD;
+	adr = (PC - CPU->BasePC) + (u32)(s16)FETCH_WORD;
 	PC += 2;
 	PRE_IO
 	READ_BYTE_F(adr, src)
@@ -363,7 +363,7 @@ OP_0xB068:
 	u32 res;
 	pointer dst;
 	pointer src;
-	adr = CPU->A[(Opcode >> 0) & 7] + (s32)(s16)FETCH_WORD;
+	adr = CPU->A[(Opcode >> 0) & 7] + (u32)(s16)FETCH_WORD;
 	PC += 2;
 	PRE_IO
 	READ_WORD_F(adr, src)
@@ -403,7 +403,7 @@ OP_0xB078:
 	u32 res;
 	pointer dst;
 	pointer src;
-	adr = (s32)(s16)FETCH_WORD;
+	adr = (u32)(s16)FETCH_WORD;
 	PC += 2;
 	PRE_IO
 	READ_WORD_F(adr, src)
@@ -443,7 +443,7 @@ OP_0xB07A:
 	u32 res;
 	pointer dst;
 	pointer src;
-	adr = (PC - CPU->BasePC) + (s32)(s16)FETCH_WORD;
+	adr = (PC - CPU->BasePC) + (u32)(s16)FETCH_WORD;
 	PC += 2;
 	PRE_IO
 	READ_WORD_F(adr, src)
@@ -633,7 +633,7 @@ OP_0xB0A8:
 	u32 res;
 	pointer dst;
 	pointer src;
-	adr = CPU->A[(Opcode >> 0) & 7] + (s32)(s16)FETCH_WORD;
+	adr = CPU->A[(Opcode >> 0) & 7] + (u32)(s16)FETCH_WORD;
 	PC += 2;
 	PRE_IO
 	READ_LONG_F(adr, src)
@@ -675,7 +675,7 @@ OP_0xB0B8:
 	u32 res;
 	pointer dst;
 	pointer src;
-	adr = (s32)(s16)FETCH_WORD;
+	adr = (u32)(s16)FETCH_WORD;
 	PC += 2;
 	PRE_IO
 	READ_LONG_F(adr, src)
@@ -717,7 +717,7 @@ OP_0xB0BA:
 	u32 res;
 	pointer dst;
 	pointer src;
-	adr = (PC - CPU->BasePC) + (s32)(s16)FETCH_WORD;
+	adr = (PC - CPU->BasePC) + (u32)(s16)FETCH_WORD;
 	PC += 2;
 	PRE_IO
 	READ_LONG_F(adr, src)
@@ -1164,7 +1164,7 @@ OP_0xB128:
 	u32 res;
 	pointer src;
 	src = (u8)CPU->D[(Opcode >> 9) & 7];
-	adr = CPU->A[(Opcode >> 0) & 7] + (s32)(s16)FETCH_WORD;
+	adr = CPU->A[(Opcode >> 0) & 7] + (u32)(s16)FETCH_WORD;
 	PC += 2;
 	PRE_IO
 	READ_BYTE_F(adr, res)
@@ -1206,7 +1206,7 @@ OP_0xB138:
 	u32 res;
 	pointer src;
 	src = (u8)CPU->D[(Opcode >> 9) & 7];
-	adr = (s32)(s16)FETCH_WORD;
+	adr = (u32)(s16)FETCH_WORD;
 	PC += 2;
 	PRE_IO
 	READ_BYTE_F(adr, res)
@@ -1368,7 +1368,7 @@ OP_0xB168:
 	u32 res;
 	pointer src;
 	src = (u16)CPU->D[(Opcode >> 9) & 7];
-	adr = CPU->A[(Opcode >> 0) & 7] + (s32)(s16)FETCH_WORD;
+	adr = CPU->A[(Opcode >> 0) & 7] + (u32)(s16)FETCH_WORD;
 	PC += 2;
 	PRE_IO
 	READ_WORD_F(adr, res)
@@ -1410,7 +1410,7 @@ OP_0xB178:
 	u32 res;
 	pointer src;
 	src = (u16)CPU->D[(Opcode >> 9) & 7];
-	adr = (s32)(s16)FETCH_WORD;
+	adr = (u32)(s16)FETCH_WORD;
 	PC += 2;
 	PRE_IO
 	READ_WORD_F(adr, res)
@@ -1572,7 +1572,7 @@ OP_0xB1A8:
 	u32 res;
 	pointer src;
 	src = (u32)CPU->D[(Opcode >> 9) & 7];
-	adr = CPU->A[(Opcode >> 0) & 7] + (s32)(s16)FETCH_WORD;
+	adr = CPU->A[(Opcode >> 0) & 7] + (u32)(s16)FETCH_WORD;
 	PC += 2;
 	PRE_IO
 	READ_LONG_F(adr, res)
@@ -1614,7 +1614,7 @@ OP_0xB1B8:
 	u32 res;
 	pointer src;
 	src = (u32)CPU->D[(Opcode >> 9) & 7];
-	adr = (s32)(s16)FETCH_WORD;
+	adr = (u32)(s16)FETCH_WORD;
 	PC += 2;
 	PRE_IO
 	READ_LONG_F(adr, res)
@@ -1697,7 +1697,7 @@ OP_0xB0C0:
 	u32 res;
 	pointer dst;
 	pointer src;
-	src = (s32)(s16)CPU->D[(Opcode >> 0) & 7];
+	src = (u32)(s16)CPU->D[(Opcode >> 0) & 7];
 	dst = (u32)CPU->A[(Opcode >> 9) & 7];
 	res = dst - src;
 	CPU->flag_notZ = res;
@@ -1713,7 +1713,7 @@ OP_0xB0C8:
 	u32 res;
 	pointer dst;
 	pointer src;
-	src = (s32)(s16)CPU->A[(Opcode >> 0) & 7];
+	src = (u32)(s16)CPU->A[(Opcode >> 0) & 7];
 	dst = (u32)CPU->A[(Opcode >> 9) & 7];
 	res = dst - src;
 	CPU->flag_notZ = res;
@@ -1792,7 +1792,7 @@ OP_0xB0E8:
 	u32 res;
 	pointer dst;
 	pointer src;
-	adr = CPU->A[(Opcode >> 0) & 7] + (s32)(s16)FETCH_WORD;
+	adr = CPU->A[(Opcode >> 0) & 7] + (u32)(s16)FETCH_WORD;
 	PC += 2;
 	PRE_IO
 	READSX_WORD_F(adr, src)
@@ -1834,7 +1834,7 @@ OP_0xB0F8:
 	u32 res;
 	pointer dst;
 	pointer src;
-	adr = (s32)(s16)FETCH_WORD;
+	adr = (u32)(s16)FETCH_WORD;
 	PC += 2;
 	PRE_IO
 	READSX_WORD_F(adr, src)
@@ -1876,7 +1876,7 @@ OP_0xB0FA:
 	u32 res;
 	pointer dst;
 	pointer src;
-	adr = (PC - CPU->BasePC) + (s32)(s16)FETCH_WORD;
+	adr = (PC - CPU->BasePC) + (u32)(s16)FETCH_WORD;
 	PC += 2;
 	PRE_IO
 	READSX_WORD_F(adr, src)
@@ -1917,7 +1917,7 @@ OP_0xB0FC:
 	u32 res;
 	pointer dst;
 	pointer src;
-	src = (s32)(s16)FETCH_WORD;
+	src = (u32)(s16)FETCH_WORD;
 	PC += 2;
 	dst = (u32)CPU->A[(Opcode >> 9) & 7];
 	res = dst - src;
@@ -1976,7 +1976,7 @@ OP_0xB1C0:
 	u32 res;
 	pointer dst;
 	pointer src;
-	src = (s32)(s32)CPU->D[(Opcode >> 0) & 7];
+	src = (u32)(s32)CPU->D[(Opcode >> 0) & 7];
 	dst = (u32)CPU->A[(Opcode >> 9) & 7];
 	res = dst - src;
 	CPU->flag_notZ = res;
@@ -1992,7 +1992,7 @@ OP_0xB1C8:
 	u32 res;
 	pointer dst;
 	pointer src;
-	src = (s32)(s32)CPU->A[(Opcode >> 0) & 7];
+	src = (u32)(s32)CPU->A[(Opcode >> 0) & 7];
 	dst = (u32)CPU->A[(Opcode >> 9) & 7];
 	res = dst - src;
 	CPU->flag_notZ = res;
@@ -2071,7 +2071,7 @@ OP_0xB1E8:
 	u32 res;
 	pointer dst;
 	pointer src;
-	adr = CPU->A[(Opcode >> 0) & 7] + (s32)(s16)FETCH_WORD;
+	adr = CPU->A[(Opcode >> 0) & 7] + (u32)(s16)FETCH_WORD;
 	PC += 2;
 	PRE_IO
 	READSX_LONG_F(adr, src)
@@ -2113,7 +2113,7 @@ OP_0xB1F8:
 	u32 res;
 	pointer dst;
 	pointer src;
-	adr = (s32)(s16)FETCH_WORD;
+	adr = (u32)(s16)FETCH_WORD;
 	PC += 2;
 	PRE_IO
 	READSX_LONG_F(adr, src)
@@ -2155,7 +2155,7 @@ OP_0xB1FA:
 	u32 res;
 	pointer dst;
 	pointer src;
-	adr = (PC - CPU->BasePC) + (s32)(s16)FETCH_WORD;
+	adr = (PC - CPU->BasePC) + (u32)(s16)FETCH_WORD;
 	PC += 2;
 	PRE_IO
 	READSX_LONG_F(adr, src)
@@ -2196,7 +2196,7 @@ OP_0xB1FC:
 	u32 res;
 	pointer dst;
 	pointer src;
-	src = (s32)(s32)FETCH_LONG;
+	src = (u32)(s32)FETCH_LONG;
 	PC += 4;
 	dst = (u32)CPU->A[(Opcode >> 9) & 7];
 	res = dst - src;
